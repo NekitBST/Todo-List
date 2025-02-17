@@ -1,12 +1,11 @@
 import React from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StyleSheet, Text, View, TouchableOpacity, FlatList, Modal, ActivityIndicator } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import colors from './Colors';
-import { tempData } from './tempData';
 import TodoList from './components/TodoList';
 import AddListModal from './components/AddListModel';
 import Fire from './Fire';
-
 
 export default class App extends React.Component {
   state = {
@@ -31,7 +30,7 @@ export default class App extends React.Component {
   }
 
   componentWillUnmount() {
-    firebase.detach();
+    this.fire.detach();
   }
 
   toggleAddTodoModal() {
@@ -43,15 +42,15 @@ export default class App extends React.Component {
   };
 
   addList = list => {
-    this.setState({lists: [...this.state.lists, {...list, id: this.state.lists.length + 1, todos: []}]});
-  };
+    this.fire.addList({
+        name: list.name,
+        color: list.color,
+        todos: []
+    });
+};
 
   updateList = list => {
-    this.setState({
-      lists: this.state.lists.map(item => {
-        return item.id === list.id ? list : item;
-      })
-    });
+    this.fire.updateList(list);
   };
 
   render() {
@@ -64,44 +63,44 @@ export default class App extends React.Component {
     }
 
     return (
-      <View style={styles.container}>
-        <Modal 
-          animationType="slide" 
-          visible={this.state.addTodoVisible}
-          onRequestClose={() => this.toggleAddTodoModal()}
-        >
-          <AddListModal closeModal={() => this.toggleAddTodoModal()} addList={this.addList} />
-        </Modal>
-        <View>
-          <Text>User: {this.state.user.uid || "Не вошел в систему"}</Text>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <View style={styles.container}>
+          <Modal
+            animationType="slide"
+            visible={this.state.addTodoVisible}
+            onRequestClose={() => this.toggleAddTodoModal()}
+          >
+            <AddListModal closeModal={() => this.toggleAddTodoModal()} addList={this.addList} />
+          </Modal>
+
+          <View style={{flexDirection: "row"}}>
+            <View style={styles.divider} />
+            <Text style={styles.title}>
+              Todo <Text style={{fontWeight: "300", color: colors.blue}}>List</Text>
+            </Text>
+            <View style={styles.divider} />
+          </View>
+
+          <View style={{marginVertical: 48}}>
+            <TouchableOpacity style={styles.addList} onPress={() => this.toggleAddTodoModal()}>
+              <AntDesign name="plus" size={16} color={colors.blue} />
+            </TouchableOpacity>
+
+            <Text style={styles.add}>Add List</Text>
+          </View>
+
+          <View style={{height: 275, paddingLeft: 0, paddingRight: 0}}>
+            <FlatList
+              data={this.state.lists}
+              keyExtractor={item => item.id.toString()}
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+              renderItem={({ item }) => this.renderList(item)}
+              keyboardShouldPersistTaps="always"
+            />
+          </View>
         </View>
-        <View style={{flexDirection: "row"}}>
-          <View style={styles.divider} />
-          <Text style={styles.title}>
-            Todo <Text style={{fontWeight: "300", color: colors.blue}}>List</Text>
-          </Text>
-          <View style={styles.divider} />
-        </View>
-
-        <View style={{marginVertical: 48}}>
-          <TouchableOpacity style={styles.addList} onPress={() => this.toggleAddTodoModal()}>
-            <AntDesign name="plus" size={16} color={colors.blue} />
-          </TouchableOpacity>
-
-          <Text style={styles.add}>Add List</Text>
-      </View>
-
-      <View style={{height: 275, paddingLeft: 0, paddingRight: 0}}>
-        <FlatList 
-          data={this.state.lists} 
-          keyExtractor={item => item.id.toString()} 
-          horizontal={true} 
-          showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => this.renderList(item)}
-          keyboardShouldPersistTaps="always"
-        />
-      </View>
-    </View>
+      </GestureHandlerRootView>
     );
   }
 }
