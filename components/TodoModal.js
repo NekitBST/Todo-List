@@ -171,7 +171,7 @@ export class TodoModal extends React.Component {
                                     {list.name.length > 15 ? list.name.substring(0, 15) + "..." : list.name}
                                 </Text>
                                 <Text style={[styles.taskCount, { color: theme.text }]}>
-                                    {completedCount} of {taskCount} задач
+                                    {completedCount} из {taskCount} задач
                                 </Text>
                             </View>
                         </View>

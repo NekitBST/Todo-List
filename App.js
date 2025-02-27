@@ -7,6 +7,7 @@ import TodoList from './components/TodoList';
 import AddListModal from './components/AddListModel';
 import Fire from './Fire';
 import { lightTheme, darkTheme } from './theme';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class App extends React.Component {
   state = {
@@ -18,7 +19,19 @@ export default class App extends React.Component {
     isListView: false
   };
 
-  componentDidMount() {
+  async componentDidMount() {
+
+    const savedTheme = await AsyncStorage.getItem('isDarkMode');
+    const savedViewMode = await AsyncStorage.getItem('isListView');
+
+    if (savedTheme !== null) {
+      this.setState({ isDarkMode: JSON.parse(savedTheme) });
+    }
+
+    if (savedViewMode !== null) {
+      this.setState({ isListView: JSON.parse(savedViewMode) });
+    }
+
     this.fire = new Fire((error, user) => {
       if (error) {
         return alert("Ой, ой, что-то пошло не так");
@@ -32,24 +45,29 @@ export default class App extends React.Component {
     });
   }
 
-  componentWillUnmount() {
+  async componentWillUnmount() {
     this.fire.detach();
+    
+    await AsyncStorage.setItem('isDarkMode', JSON.stringify(this.state.isDarkMode));
+    await AsyncStorage.setItem('isListView', JSON.stringify(this.state.isListView));
   }
 
   toggleAddTodoModal() {
     this.setState({ addTodoVisible: !this.state.addTodoVisible });
   }
 
-  toggleTheme = () => {
-    this.setState(prevState => ({
-      isDarkMode: !prevState.isDarkMode
-    }));
+  toggleTheme = async () => {
+    const newTheme = !this.state.isDarkMode;
+    this.setState({ isDarkMode: newTheme });
+    
+    await AsyncStorage.setItem('isDarkMode', JSON.stringify(newTheme));
   };
 
-  toggleViewMode = () => {
-    this.setState(prevState => ({
-      isListView: !prevState.isListView
-    }));
+  toggleViewMode = async () => {
+    const newViewMode = !this.state.isListView;
+    this.setState({ isListView: newViewMode });
+    
+    await AsyncStorage.setItem('isListView', JSON.stringify(newViewMode));
   };
 
   deleteList = listId => {

@@ -6,7 +6,8 @@ export const lightTheme = {
 };
 
 export const darkTheme = {
-    background: '#1A1A1A',
+    background: '#2D2D2D',
+    //background: '#1A1A1A',
     text: '#FFFFFF',
     divider: '#404040',
     modalBackground: '#2D2D2D',
