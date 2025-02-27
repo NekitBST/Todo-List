@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged, signInAnonymously } from "firebase/auth";
-import { getFirestore, collection, query, orderBy, onSnapshot, addDoc, updateDoc, doc } from "firebase/firestore";
+import { getFirestore, collection, query, orderBy, onSnapshot, addDoc, updateDoc, doc, deleteDoc } from "firebase/firestore";
 
 const firebaseConfig = {
     apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
@@ -60,6 +60,11 @@ class Fire {
     updateList(list) {
         const docRef = doc(db, "users", this.userId, "lists", list.id);
         return updateDoc(docRef, list);
+    }
+
+    deleteList(listId) {
+        const docRef = doc(db, "users", this.userId, "lists", listId);
+        return deleteDoc(docRef);
     }
 
     get userId() {
