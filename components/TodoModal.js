@@ -97,7 +97,7 @@ export class TodoModal extends React.Component {
             <TouchableOpacity onPress={() => this.deleteTodo(index)}>
                 <Animated.View style={[styles.swipeDeleteButton, {opacity: opacity}]}>
                     <Animated.Text style={{color: colors.white, fontWeight: "800", transform: [{scale}]}}>
-                        Удалить
+                        Delete
                     </Animated.Text>
                 </Animated.View>
             </TouchableOpacity>
@@ -125,17 +125,17 @@ export class TodoModal extends React.Component {
                                 <View style={[styles.alertBox, { backgroundColor: theme.modalBackground }]}>
                                     <View style={styles.alertHeader}>
                                         <AntDesign name="delete" size={24} color={colors.red} />
-                                        <Text style={[styles.alertTitle, { color: theme.text }]}>Удалить лист</Text>
+                                        <Text style={[styles.alertTitle, { color: theme.text }]}>Delete Sheet</Text>
                                     </View>
                                     <Text style={[styles.alertMessage, { color: theme.text }]}>
-                                        Вы уверены, что хотите удалить этот лист?
+                                        Are you sure you want to delete this sheet?
                                     </Text>
                                     <View style={styles.alertButtons}>
                                         <TouchableOpacity 
                                             style={[styles.alertButton, styles.cancelButton]}
                                             onPress={() => this.setState({ showDeleteAlert: false })}
                                         >
-                                            <Text style={styles.cancelButtonText}>Назад</Text>
+                                            <Text style={styles.cancelButtonText}>Back</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity 
                                             style={[styles.alertButton, styles.deleteButton]}
@@ -144,7 +144,7 @@ export class TodoModal extends React.Component {
                                                 this.props.closeModal();
                                             }}
                                         >
-                                            <Text style={styles.deleteButtonText}>Удалить</Text>
+                                            <Text style={styles.deleteButtonText}>Delete</Text>
                                         </TouchableOpacity>
                                     </View>
                                 </View>
@@ -171,7 +171,7 @@ export class TodoModal extends React.Component {
                                     {list.name.length > 15 ? list.name.substring(0, 15) + "..." : list.name}
                                 </Text>
                                 <Text style={[styles.taskCount, { color: theme.text }]}>
-                                    {completedCount} из {taskCount} задач
+                                    {completedCount} of {taskCount} tasks
                                 </Text>
                             </View>
                         </View>
@@ -198,7 +198,7 @@ export class TodoModal extends React.Component {
                                 onChangeText={text => this.setState({newTodo: text})} 
                                 value={this.state.newTodo}
                                 placeholderTextColor={theme.text}
-                                placeholder="Добавьте задачу "
+                                placeholder="Add a task"
                                 onKeyPress={this.handleKeyPress}
                             />
                             <TouchableOpacity 

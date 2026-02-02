@@ -53,10 +53,10 @@ export default class AddListModal extends React.Component {
                         <View style={[styles.alertBox, { backgroundColor: theme.modalBackground }]}>
                             <View style={styles.alertHeader}>
                                 <AntDesign name="warning" size={24} color={colors.red} />
-                                <Text style={[styles.alertTitle, { color: theme.text }]}>Упсс...</Text>
+                                <Text style={[styles.alertTitle, { color: theme.text }]}>Oops...</Text>
                             </View>
                             <Text style={[styles.alertMessage, { color: theme.text }]}>
-                                Введите имя листа!
+                                Enter a sheet name!
                             </Text>
                             <TouchableOpacity 
                                 style={[styles.alertButton, { backgroundColor: colors.blue }]}
@@ -73,7 +73,7 @@ export default class AddListModal extends React.Component {
                 </TouchableOpacity>
 
                 <View style={{alignSelf: "stretch", marginHorizontal: 32}}>
-                    <Text style={[styles.title, { color: theme.text }]}>Создать Todo List</Text>
+                    <Text style={[styles.title, { color: theme.text }]}>Create Todo List</Text>
 
                     <TextInput 
                         style={[styles.input, { 
@@ -81,7 +81,7 @@ export default class AddListModal extends React.Component {
                             color: theme.text,
                             backgroundColor: theme.modalBackground
                         }]} 
-                        placeholder="Имя листа?"
+                        placeholder="Sheet name?"
                         placeholderTextColor={theme.text}
                         onChangeText={text => this.setState({name: text})} 
                     />

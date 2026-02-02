@@ -1,6 +1,6 @@
 import React from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { StyleSheet, Text, View, TouchableOpacity, FlatList, Modal, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, FlatList, Modal, ActivityIndicator, Platform } from 'react-native';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
 import colors from './Colors';
 import TodoList from './components/TodoList';
@@ -19,6 +19,8 @@ export default class App extends React.Component {
     isListView: false
   };
 
+  scrollViewRef = React.createRef();
+
   async componentDidMount() {
 
     const savedTheme = await AsyncStorage.getItem('isDarkMode');
@@ -34,7 +36,7 @@ export default class App extends React.Component {
 
     this.fire = new Fire((error, user) => {
       if (error) {
-        return alert("Ой, ой, что-то пошло не так");
+        return alert("Oops, oops, something went wrong");
       }
 
       this.setState({ user });
@@ -43,6 +45,10 @@ export default class App extends React.Component {
         this.setState({ lists, loading: false });
       });
     });
+
+    if (Platform.OS === 'web') {
+      this.addWebWheelListener();
+    }
   }
 
   async componentWillUnmount() {
@@ -50,7 +56,30 @@ export default class App extends React.Component {
     
     await AsyncStorage.setItem('isDarkMode', JSON.stringify(this.state.isDarkMode));
     await AsyncStorage.setItem('isListView', JSON.stringify(this.state.isListView));
+
+    if (Platform.OS === 'web' && this.wheelListener) {
+      window.removeEventListener('wheel', this.wheelListener);
+    }
   }
+
+  addWebWheelListener = () => {
+    this.wheelListener = (e) => {
+      if (this.scrollViewRef.current && !this.state.isListView) {
+        const scrollView = this.scrollViewRef.current;
+        if (scrollView._listRef) {
+          const scrollNode = scrollView._listRef._scrollRef;
+          if (scrollNode && e.deltaY !== 0) {
+            e.preventDefault();
+            scrollNode.scrollLeft += e.deltaY;
+          }
+        }
+      }
+    };
+    
+    setTimeout(() => {
+      window.addEventListener('wheel', this.wheelListener, { passive: false });
+    }, 100);
+  };
 
   toggleAddTodoModal() {
     this.setState({ addTodoVisible: !this.state.addTodoVisible });
@@ -100,10 +129,11 @@ export default class App extends React.Component {
 
   render() {
     const theme = this.state.isDarkMode ? darkTheme : lightTheme;
+    const isWeb = Platform.OS === 'web';
 
     if (this.state.loading) {
       return (
-        <View style={[styles.container, { backgroundColor: theme.background }]}>
+        <View style={[styles.container, styles.loadingContainer, { backgroundColor: theme.background }]}>
           <ActivityIndicator size="large" color={colors.blue} />
         </View>
       )
@@ -111,7 +141,10 @@ export default class App extends React.Component {
 
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <View style={[styles.container, { backgroundColor: theme.background }]}>
+        <View style={[
+          styles.container, 
+          { backgroundColor: theme.background }
+        ]}>
           <View style={styles.headerButtons}>
             <TouchableOpacity 
               style={styles.themeToggle} 
@@ -168,9 +201,15 @@ export default class App extends React.Component {
 
           <View style={[
             styles.listContainer,
-            this.state.isListView && styles.listViewContainer
+            isWeb && styles.listContainerWeb,
+            !isWeb && styles.listContainerMobile,
+            !isWeb && !this.state.isListView && styles.listContainerMobileCentered,
+            this.state.isListView && styles.listViewContainer,
+            this.state.isListView && isWeb && styles.listViewContainerWeb,
+            this.state.isListView && !isWeb && styles.listViewContainerMobile
           ]}>
             <FlatList
+              ref={this.scrollViewRef}
               data={this.state.lists}
               keyExtractor={item => item.id.toString()}
               horizontal={!this.state.isListView}
@@ -191,8 +230,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+  },
+  loadingContainer: {
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   divider: {
     backgroundColor: colors.lightBlue,
@@ -235,17 +276,45 @@ const styles = StyleSheet.create({
   header: {
     width: '100%',
     alignItems: 'center',
-    paddingTop: 120
+    paddingTop: 120,
+    paddingBottom: 30
   },
   listContainer: {
-    height: 275,
     paddingLeft: 0,
     paddingRight: 0
+  },
+  listContainerWeb: {
+    position: 'absolute',
+    top: 370,
+    left: 0,
+    right: 0,
+    bottom: 0
+  },
+  listContainerMobile: {
+    position: 'absolute',
+    top: 370,
+    left: 0,
+    right: 0,
+    bottom: 0
+  },
+  listContainerMobileCentered: {
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   listViewContainer: {
     flex: 1,
     height: undefined, 
     marginTop: 20
+  },
+  listViewContainerWeb: {
+    top: 370,
+    bottom: 20,
+    marginTop: 0
+  },
+  listViewContainerMobile: {
+    top: 370,
+    bottom: 20,
+    marginTop: 0
   },
   verticalList: {
     width: '100%'
