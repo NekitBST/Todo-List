@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, FlatList, KeyboardAvoidingView, TextInput, Keyboard, Animated, Alert, Modal } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, FlatList, KeyboardAvoidingView, TextInput, Keyboard, Animated, Alert, Modal, Platform, ScrollView } from 'react-native';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
 import colors from '../Colors';
 import {Swipeable, GestureHandlerRootView} from 'react-native-gesture-handler';
@@ -107,6 +107,7 @@ export class TodoModal extends React.Component {
     render() {
         const list = this.props.list;
         const theme = this.props.isDarkMode ? darkTheme : lightTheme;
+        const isWeb = Platform.OS === 'web';
 
         const taskCount = list.todos.length;
         const completedCount = list.todos.filter(todo => todo.completed).length;
@@ -176,12 +177,15 @@ export class TodoModal extends React.Component {
                             </View>
                         </View>
 
-                        <View style={[styles.section, {flex: 3, marginVertical: 16}]}>
+                        <View style={[styles.section, styles.listSection]}>
                             <FlatList 
                                 data={list.todos}
                                 renderItem={({item, index}) => this.renderTodo(item, index)}
                                 keyExtractor={(item => item.title)}
                                 showsVerticalScrollIndicator={false}
+                                style={isWeb ? styles.flatListWeb : null}
+                                contentContainerStyle={isWeb ? styles.flatListContentWeb : null}
+                                nestedScrollEnabled={true}
                             />
                         </View>
 
@@ -241,6 +245,22 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         color: colors.gray,
         fontWeight: "600"
+    },
+    listSection: {
+        flex: 3,
+        marginVertical: 16,
+        overflow: 'hidden'
+    },
+    flatListWeb: {
+        flex: 1,
+        overflow: 'auto',
+        ...(Platform.OS === 'web' && {
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+        }),
+    },
+    flatListContentWeb: {
+        flexGrow: 1
     },
     footer: {
         paddingHorizontal: 32,
